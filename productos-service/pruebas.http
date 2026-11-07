@@ -1,5 +1,6 @@
 @host = http://localhost:8082/api/v1
 
+###=============Categorias=============
 POST {{host}}/categorias
 Content-Type: application/json
 
@@ -15,3 +16,50 @@ Content-Type: application/json
 {"nombre": "Pinturas", "slug": "pinturas", "icono": "pintura.svg"}
 
 GET {{host}}/categorias/999
+
+###=============Productos================
+GET {{host}}/productos
+
+
+GET {{host}}/productos?categoria=pinturas
+
+
+GET {{host}}/productos/stock-critico
+
+
+GET {{host}} productos/1
+
+
+POST {{host}}/productos
+Content-Type: application/json
+
+{ "codigo": "SIE100", "nombre": "Sierra Circular", "precio": 45000, "stock": 5, "stockCritico": 2, "categoriaId":2 }
+
+
+POST {{host}}/productos
+Content-Type: application/json
+
+{ "codigo": "XXX999", "nombre": "Prueba", "precio": -5, "stock": 1, "stockCritico": 5, "categoriaId": 1 }
+
+
+GET {{host}}/productos/999
+
+
+PUT {{host}}/productos/1
+Content-Type: application/json
+
+{ "codigo": "MAR001", "nombre": "Martillo Carpintero Pro", "precio": 7990, "stock": 25, "stockCritico": 5, "categoriaId": 1 }
+
+
+PATCH {{host}}/productos71/stock/descontar
+
+{ "cantidad": 2 }
+
+
+PATCH {{host}}/productos/1/stock/descontar
+Content-Type: application/json
+
+{ "cantidad": 9999}
+
+
+DELETE {{host}}/productos/7

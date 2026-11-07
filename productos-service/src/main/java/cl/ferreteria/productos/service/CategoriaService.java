@@ -2,6 +2,7 @@ package cl.ferreteria.productos.service;
 
 import cl.ferreteria.productos.model.Categoria;
 import cl.ferreteria.productos.repository.CategoriaRepository;
+import cl.ferreteria.productos.repository.ProductosRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -12,9 +13,11 @@ import java.util.List;
 public class CategoriaService {
     
     private final CategoriaRepository repo;
+    private final ProductosRepository productoRepo;
 
-    public CategoriaService(CategoriaRepository repo){
+    public CategoriaService(CategoriaRepository repo, ProductosRepository productoRepo){
         this.repo = repo;
+        this.productoRepo = productoRepo;
     }
 
     public List<Categoria> listar() {
@@ -47,6 +50,11 @@ public class CategoriaService {
 
     public void eliminar(long id){
         obtener(id);
+        if (productoRepo.existsByCategoriaId(id)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                "No se puede eliminar: Hay productos en esta categoria"
+            );
+        }
         repo.deleteById(id);
     }
 
