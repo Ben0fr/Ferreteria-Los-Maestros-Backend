@@ -1,0 +1,17 @@
+@host = http://localhost:8082/api/v1
+
+POST {{host}}/categorias
+Content-Type: application/json
+
+{"nombre": "Pinturas", "slug": "pinturas", "icono": "pintura.svg"}
+
+GET {{host}}/categorias
+
+POST {{host}}/categorias
+
+POST {{host}}/categorias
+Content-Type: application/json
+
+{"nombre": "Pinturas", "slug": "pinturas", "icono": "pintura.svg"}
+
+GET {{host}}/categorias/999
