@@ -51,7 +51,7 @@ Content-Type: application/json
 { "codigo": "MAR001", "nombre": "Martillo Carpintero Pro", "precio": 7990, "stock": 25, "stockCritico": 5, "categoriaId": 1 }
 
 
-PATCH {{host}}/productos71/stock/descontar
+PATCH {{host}}/productos/1/stock/descontar
 
 { "cantidad": 2 }
 
@@ -61,5 +61,10 @@ Content-Type: application/json
 
 { "cantidad": 9999}
 
+
+PATCH {{host}}/productos/1/stock/aumentar
+Content-Type: application/json
+
+{ "catidad " : 5}
 
 DELETE {{host}}/productos/7

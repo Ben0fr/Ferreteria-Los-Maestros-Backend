@@ -56,4 +56,9 @@ public class ProductosController {
     public ProductoResponse descontarStock(@PathVariable Long id, @Valid @RequestBody StockRequest request) {
         return servicio.descontarStock(id, request.cantidad());
     }
+
+    @PatchMapping("/{id}/stock/aumentar")
+    public ProductoResponse aumentarStock(@PathVariable Long id, @Valid @RequestBody StockRequest request) {
+        return servicio.aumentarStock(id, request.cantidad());
+    }
 }

@@ -83,6 +83,13 @@ public class ProductoService {
         return ProductoResponse.desde(repo.save(p));
     }
 
+    @Transactional 
+    public ProductoResponse aumentarStock(Long id, int cantidad) {
+        Productos p = buscar(id);
+        p.setStock(p.getStock() + cantidad);
+        return ProductoResponse.desde(repo.save(p));
+    }
+
     private Productos buscar(Long id) {
         return repo.findById(id).orElseThrow(() ->
             new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado"));
