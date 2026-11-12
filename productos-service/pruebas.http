@@ -1,70 +1,87 @@
 @host = http://localhost:8082/api/v1
 
-###=============Categorias=============
-POST {{host}}/categorias
-Content-Type: application/json
+### ============ CATEGORIAS ============
 
-{"nombre": "Pinturas", "slug": "pinturas", "icono": "pintura.svg"}
-
+### Listar categorias (6)
 GET {{host}}/categorias
 
-POST {{host}}/categorias
-
+### Crear categoria nueva (201)
 POST {{host}}/categorias
 Content-Type: application/json
 
-{"nombre": "Pinturas", "slug": "pinturas", "icono": "pintura.svg"}
+{ "nombre": "Jardin", "slug": "jardin", "icono": "jardin.svg" }
 
+### Crear la misma otra vez (409)
+POST {{host}}/categorias
+Content-Type: application/json
+
+{ "nombre": "Jardin", "slug": "jardin", "icono": "jardin.svg" }
+
+### Categoria inexistente (404)
 GET {{host}}/categorias/999
 
-###=============Productos================
+### Borrar categoria con productos (409)
+DELETE {{host}}/categorias/1
+
+### Borrar categoria vacia (204). Cambia el 7 por el id de "Jardin"
+DELETE {{host}}/categorias/7
+
+### ============ PRODUCTOS ============
+
+### Listar productos (6)
 GET {{host}}/productos
 
-
+### Filtrar por categoria (1 producto)
 GET {{host}}/productos?categoria=pinturas
 
-
+### Stock critico
 GET {{host}}/productos/stock-critico
 
+### Detalle de un producto
+GET {{host}}/productos/1
 
-GET {{host}} productos/1
-
-
+### Crear producto (201)
 POST {{host}}/productos
 Content-Type: application/json
 
-{ "codigo": "SIE100", "nombre": "Sierra Circular", "precio": 45000, "stock": 5, "stockCritico": 2, "categoriaId":2 }
+{ "codigo": "SIE100", "nombre": "Sierra Circular", "precio": 45000, "stock": 5, "stockCritico": 2, "categoriaId": 2 }
 
+### Codigo repetido (409): ejecuta la peticion anterior otra vez
 
+### Precio negativo (400)
 POST {{host}}/productos
 Content-Type: application/json
 
 { "codigo": "XXX999", "nombre": "Prueba", "precio": -5, "stock": 1, "stockCritico": 5, "categoriaId": 1 }
 
-
+### Producto inexistente (404)
 GET {{host}}/productos/999
 
-
+### Modificar producto (200)
 PUT {{host}}/productos/1
 Content-Type: application/json
 
 { "codigo": "MAR001", "nombre": "Martillo Carpintero Pro", "precio": 7990, "stock": 25, "stockCritico": 5, "categoriaId": 1 }
 
+### ============ STOCK ============
 
+### Descontar stock (200)
 PATCH {{host}}/productos/1/stock/descontar
+Content-Type: application/json
 
 { "cantidad": 2 }
 
-
+### Descontar mas de lo disponible (409)
 PATCH {{host}}/productos/1/stock/descontar
 Content-Type: application/json
 
-{ "cantidad": 9999}
+{ "cantidad": 9999 }
 
-
+### Aumentar stock (200)
 PATCH {{host}}/productos/1/stock/aumentar
 Content-Type: application/json
 
-{ "catidad " : 5}
+{ "cantidad": 5 }
 
+### Borrar un producto (204). Cambia el 7 por el id del que creaste
 DELETE {{host}}/productos/7
