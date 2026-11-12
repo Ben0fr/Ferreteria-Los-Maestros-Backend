@@ -9,7 +9,7 @@ public record ProductoRemoto(
     String categoriaSlug,
     Long categoriaId,
     int precio,
-    int stokc,
+    int stock,
     Integer stockCritico,
     boolean stockEnNivelCritico,
     String icono

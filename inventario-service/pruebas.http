@@ -1,0 +1,52 @@
+@host = http://localhost:8085/api/v1/inventario
+
+### Registrar ENTRADA de stock (201)
+POST {{host}}/movimientos
+Content-Type: application/json
+
+{ "productoId": 1, "tipo": "ENTRADA", "cantidad": 10, "motivo": "Compra a proveedor" }
+
+### Registrar SALIDA (201)
+POST {{host}}/movimientos
+Content-Type: application/json
+
+{ "productoId": 1, "tipo": "SALIDA", "cantidad": 3, "motivo": "Merma por dano" }
+
+### SALIDA mayor al stock disponible (409)
+POST {{host}}/movimientos
+Content-Type: application/json
+
+{ "productoId": 1, "tipo": "SALIDA", "cantidad": 9999, "motivo": "Prueba" }
+
+### Producto inexistente (404)
+POST {{host}}/movimientos
+Content-Type: application/json
+
+{ "productoId": 999, "tipo": "ENTRADA", "cantidad": 5 }
+
+### Cantidad invalida (400)
+POST {{host}}/movimientos
+Content-Type: application/json
+
+{ "productoId": 1, "tipo": "ENTRADA", "cantidad": 0 }
+
+### Tipo invalido (400)
+POST {{host}}/movimientos
+Content-Type: application/json
+
+{ "productoId": 1, "tipo": "ROBO", "cantidad": 1 }
+
+### Historial completo
+GET {{host}}/movimientos
+
+### Historial de un producto
+GET {{host}}/movimientos?productoId=1
+
+### Dejar un producto en stock critico (tornillos, id 6, deja 5 unidades)
+POST {{host}}/movimientos
+Content-Type: application/json
+
+{ "productoId": 6, "tipo": "SALIDA", "cantidad": 45, "motivo": "Venta mayorista" }
+
+### Alertas de stock critico
+GET {{host}}/alertas

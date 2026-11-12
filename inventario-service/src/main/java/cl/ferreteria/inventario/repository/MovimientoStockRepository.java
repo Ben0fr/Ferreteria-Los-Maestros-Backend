@@ -1,4 +1,4 @@
-package cl.ferreteria.inventario.Repository;
+package cl.ferreteria.inventario.repository;
 
 import cl.ferreteria.inventario.model.MovimientoStock;
 import org.springframework.data.jpa.repository.JpaRepository;
