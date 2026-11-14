@@ -1,0 +1,94 @@
+@host = http://localhost:8084/api/v1
+
+### ============ ARTICULOS DEL BLOG ============
+
+### Listar articulos (2 de ejemplo, el mas nuevo primero)
+GET {{host}}/articulos
+
+### Detalle de un articulo (incluye "parrafos" listo para mostrar)
+GET {{host}}/articulos/1
+
+### Articulo inexistente (404)
+GET {{host}}/articulos/999
+
+### Crear un articulo (201)
+POST {{host}}/articulos
+Content-Type: application/json
+
+{
+  "titulo": "Como elegir un taladro",
+  "resumen": "Que mirar antes de comprar un taladro para el hogar.",
+  "contenido": "Primero define para que lo vas a usar.\n\nLuego revisa la potencia y si es percutor.\n\nPor ultimo, compara accesorios incluidos.",
+  "imagen": "/img/taladro.jpg",
+  "imagenAlt": "Taladro percutor",
+  "autor": "Ferretería Los Maestros"
+}
+
+### Crear sin titulo ni contenido (400)
+POST {{host}}/articulos
+Content-Type: application/json
+
+{ "titulo": "", "resumen": "Resumen", "contenido": "" }
+
+### Editar el articulo 1 (200)
+PUT {{host}}/articulos/1
+Content-Type: application/json
+
+{
+  "titulo": "5 elementos de seguridad para trabajar en casa (actualizado)",
+  "resumen": "Conoce los elementos basicos de proteccion personal.",
+  "contenido": "Primer parrafo.\n\nSegundo parrafo.",
+  "imagen": "/img/images.jpg",
+  "imagenAlt": "Elementos de seguridad"
+}
+
+### Eliminar un articulo (204). Cambia el 3 por el id del articulo creado arriba
+DELETE {{host}}/articulos/3
+
+### ============ MENSAJES DE CONTACTO ============
+
+### Enviar un mensaje, como lo hace el formulario de la tienda (201)
+POST {{host}}/contacto
+Content-Type: application/json
+
+{
+  "nombre": "Pedro Soto",
+  "correo": "pedro@gmail.com",
+  "comentario": "Hola, quisiera cotizar una pintura para mi casa."
+}
+
+### Correo con dominio no permitido (400)
+POST {{host}}/contacto
+Content-Type: application/json
+
+{ "nombre": "Pedro Soto", "correo": "pedro@hotmail.com", "comentario": "Hola" }
+
+### Campos vacios (400)
+POST {{host}}/contacto
+Content-Type: application/json
+
+{ "nombre": "", "correo": "", "comentario": "" }
+
+### Listar todos los mensajes (el administrador)
+GET {{host}}/contacto
+
+### Solo los pendientes de revisar
+GET {{host}}/contacto?leido=false
+
+### Solo los ya leidos
+GET {{host}}/contacto?leido=true
+
+### Ver un mensaje
+GET {{host}}/contacto/1
+
+### Marcar el mensaje 2 como leido (200)
+PATCH {{host}}/contacto/2/leido
+Content-Type: application/json
+
+{ "leido": true }
+
+### Mensaje inexistente (404)
+GET {{host}}/contacto/999
+
+### Eliminar un mensaje (204)
+DELETE {{host}}/contacto/1
