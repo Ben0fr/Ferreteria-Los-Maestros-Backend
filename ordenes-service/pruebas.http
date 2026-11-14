@@ -1,0 +1,119 @@
+@host = http://localhost:8083/api/v1
+
+# Requisito para crear ordenes: productos-service corriendo en el puerto 8082
+# (la orden consulta los precios y descuenta el stock alli).
+
+### ============ LISTAR Y VER DETALLE ============
+
+### Listar todas las ordenes (3 de ejemplo, las mas nuevas primero)
+GET {{host}}/ordenes
+
+### Filtrar por estado
+GET {{host}}/ordenes?estado=PENDIENTE
+
+### Filtrar por correo del cliente (2 ordenes)
+GET {{host}}/ordenes?correo=juan@gmail.com
+
+### Estados disponibles
+GET {{host}}/ordenes/estados
+
+### Detalle de una orden (con sus productos)
+GET {{host}}/ordenes/1
+
+### Orden inexistente (404)
+GET {{host}}/ordenes/999
+
+### Estado que no existe (400)
+GET {{host}}/ordenes?estado=XYZ
+
+### ============ CREAR ORDEN ============
+
+### Crear una orden (201). Descuenta el stock en productos-service
+POST {{host}}/ordenes
+Content-Type: application/json
+
+{
+  "clienteNombre": "Pedro Soto",
+  "clienteCorreo": "pedro@gmail.com",
+  "direccionEntrega": "Calle Prat 789, La Serena",
+  "items": [
+    { "productoId": 1, "cantidad": 2 },
+    { "productoId": 6, "cantidad": 1 }
+  ]
+}
+
+### Sin productos (400)
+POST {{host}}/ordenes
+Content-Type: application/json
+
+{
+  "clienteNombre": "Pedro Soto",
+  "clienteCorreo": "pedro@gmail.com",
+  "direccionEntrega": "Calle Prat 789, La Serena",
+  "items": []
+}
+
+### Datos invalidos (400)
+POST {{host}}/ordenes
+Content-Type: application/json
+
+{
+  "clienteNombre": "",
+  "clienteCorreo": "esto-no-es-un-correo",
+  "direccionEntrega": "",
+  "items": [ { "productoId": 1, "cantidad": 0 } ]
+}
+
+### Mas unidades de las que hay en stock (409)
+POST {{host}}/ordenes
+Content-Type: application/json
+
+{
+  "clienteNombre": "Pedro Soto",
+  "clienteCorreo": "pedro@gmail.com",
+  "direccionEntrega": "Calle Prat 789, La Serena",
+  "items": [ { "productoId": 1, "cantidad": 9999 } ]
+}
+
+### Producto que no existe (404)
+POST {{host}}/ordenes
+Content-Type: application/json
+
+{
+  "clienteNombre": "Pedro Soto",
+  "clienteCorreo": "pedro@gmail.com",
+  "direccionEntrega": "Calle Prat 789, La Serena",
+  "items": [ { "productoId": 999, "cantidad": 1 } ]
+}
+
+### ============ CAMBIAR ESTADO ============
+
+### Pasar la orden 2 de PENDIENTE a CONFIRMADA (200)
+PATCH {{host}}/ordenes/2/estado
+Content-Type: application/json
+
+{ "estado": "CONFIRMADA" }
+
+### Saltarse un paso: de CONFIRMADA a ENVIADA (409)
+PATCH {{host}}/ordenes/2/estado
+Content-Type: application/json
+
+{ "estado": "ENVIADA" }
+
+### Cancelar la orden 2 (200). Devuelve el stock a productos-service
+PATCH {{host}}/ordenes/2/estado
+Content-Type: application/json
+
+{ "estado": "CANCELADA" }
+
+### Cancelar una orden ya entregada (409)
+PATCH {{host}}/ordenes/1/estado
+Content-Type: application/json
+
+{ "estado": "CANCELADA" }
+
+### Estado inexistente (400)
+PATCH {{host}}/ordenes/3/estado
+Content-Type: application/json
+
+{ "estado": "XYZ" }

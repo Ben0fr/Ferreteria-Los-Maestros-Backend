@@ -1,0 +1,17 @@
+C:\Users\maxiv\Downloads\contenido-service\contenido-service\src\main\java\cl\ferreteria\contenido\config\CorsConfig.java
+C:\Users\maxiv\Downloads\contenido-service\contenido-service\src\main\java\cl\ferreteria\contenido\config\DataLoader.java
+C:\Users\maxiv\Downloads\contenido-service\contenido-service\src\main\java\cl\ferreteria\contenido\ContenidoServiceApplication.java
+C:\Users\maxiv\Downloads\contenido-service\contenido-service\src\main\java\cl\ferreteria\contenido\controller\ArticulosController.java
+C:\Users\maxiv\Downloads\contenido-service\contenido-service\src\main\java\cl\ferreteria\contenido\controller\ContactoController.java
+C:\Users\maxiv\Downloads\contenido-service\contenido-service\src\main\java\cl\ferreteria\contenido\dto\ArticuloRequest.java
+C:\Users\maxiv\Downloads\contenido-service\contenido-service\src\main\java\cl\ferreteria\contenido\dto\ArticuloResponse.java
+C:\Users\maxiv\Downloads\contenido-service\contenido-service\src\main\java\cl\ferreteria\contenido\dto\LeidoRequest.java
+C:\Users\maxiv\Downloads\contenido-service\contenido-service\src\main\java\cl\ferreteria\contenido\dto\MensajeRequest.java
+C:\Users\maxiv\Downloads\contenido-service\contenido-service\src\main\java\cl\ferreteria\contenido\dto\MensajeResponse.java
+C:\Users\maxiv\Downloads\contenido-service\contenido-service\src\main\java\cl\ferreteria\contenido\exception\GlobalExceptionHandler.java
+C:\Users\maxiv\Downloads\contenido-service\contenido-service\src\main\java\cl\ferreteria\contenido\model\Articulo.java
+C:\Users\maxiv\Downloads\contenido-service\contenido-service\src\main\java\cl\ferreteria\contenido\model\MensajeContacto.java
+C:\Users\maxiv\Downloads\contenido-service\contenido-service\src\main\java\cl\ferreteria\contenido\repository\ArticuloRepository.java
+C:\Users\maxiv\Downloads\contenido-service\contenido-service\src\main\java\cl\ferreteria\contenido\repository\MensajeContactoRepository.java
+C:\Users\maxiv\Downloads\contenido-service\contenido-service\src\main\java\cl\ferreteria\contenido\service\ArticuloService.java
+C:\Users\maxiv\Downloads\contenido-service\contenido-service\src\main\java\cl\ferreteria\contenido\service\MensajeContactoService.java

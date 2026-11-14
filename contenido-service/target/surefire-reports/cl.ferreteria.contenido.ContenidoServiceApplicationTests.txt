@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: cl.ferreteria.contenido.ContenidoServiceApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.934 s -- in cl.ferreteria.contenido.ContenidoServiceApplicationTests
