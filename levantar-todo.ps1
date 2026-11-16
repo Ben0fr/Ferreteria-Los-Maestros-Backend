@@ -4,6 +4,22 @@
 
 $raiz = $PSScriptRoot
 
+# Maven necesita JAVA_HOME. Si no esta definido, se busca un JDK (java en el PATH o los que instala IntelliJ en ~/.jdks).
+# Las ventanas que se abren despues heredan esta variable.
+if (-not $env:JAVA_HOME -or -not (Test-Path (Join-Path $env:JAVA_HOME 'bin\javac.exe'))) {
+    $candidatos = @()
+    $java = Get-Command java -ErrorAction SilentlyContinue
+    if ($java) { $candidatos += Split-Path (Split-Path $java.Source -Parent) -Parent }
+    $candidatos += Get-ChildItem "$env:USERPROFILE\.jdks" -Directory -ErrorAction SilentlyContinue | Sort-Object Name | ForEach-Object { $_.FullName }
+    $jdk = $candidatos | Where-Object { Test-Path (Join-Path $_ 'bin\javac.exe') } | Select-Object -First 1
+    if (-not $jdk) {
+        Write-Host "No se encontro un JDK. Instala Java 17 o superior, o define JAVA_HOME." -ForegroundColor Red
+        exit 1
+    }
+    $env:JAVA_HOME = $jdk
+    Write-Host "JAVA_HOME no estaba definido, se usa $jdk" -ForegroundColor Yellow
+}
+
 function Puerto-Ocupado($puerto) {
     return [bool](Get-NetTCPConnection -LocalPort $puerto -State Listen -ErrorAction SilentlyContinue)
 }
