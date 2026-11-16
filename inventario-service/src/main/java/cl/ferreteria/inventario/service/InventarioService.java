@@ -26,13 +26,9 @@ public class InventarioService {
     }
 
     public MovimientoResponse registrar(MovimientoRequest r) {
-
-        // El stock se modifica desde productos-service y si no existe el producto retorna un 404 o si no alcanza un 409 y se corta altoke
         ProductoRemoto actualizado = (r.tipo() == TipoMovimiento.ENTRADA)
                 ? productos.aumentarStock(r.productoId(), r.cantidad())
                 : productos.descontarStock(r.productoId(), r.cantidad());
-
-        // Si sale todo full se guarda el movimiento en el historial
         MovimientoStock m = new MovimientoStock();
         m.setProductoId(actualizado.id());
         m.setProductoNombre(actualizado.nombre());

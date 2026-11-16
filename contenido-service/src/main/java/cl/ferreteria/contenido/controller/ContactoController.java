@@ -20,14 +20,12 @@ public class ContactoController {
         this.servicio = servicio;
     }
 
-    // Lo usa el formulario de contacto de la tienda (cualquier visitante)
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public MensajeResponse enviar(@Valid @RequestBody MensajeRequest request) {
         return servicio.crear(request);
     }
 
-    // Lo usa el administrador para revisar los mensajes
     @GetMapping
     public List<MensajeResponse> listar(@RequestParam(required = false) Boolean leido) {
         return servicio.listar(leido);

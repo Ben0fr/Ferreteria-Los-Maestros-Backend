@@ -1,87 +1,214 @@
 @host = http://localhost:8082/api/v1
+@usuarios = http://localhost:8081/api/v1
 
-### ============ CATEGORIAS ============
+### ============ TOKENS (los emite usuarios-service) ============
 
-### Listar categorias (6)
+### Login como ADMINISTRADOR
+# @name loginAdmin
+POST {{usuarios}}/auth/login
+Content-Type: application/json
+
+{ "correo": "admin@gmail.com", "clave": "admin123" }
+
+###
+@tokenAdmin = {{loginAdmin.response.body.accessToken}}
+
+### Login como VENDEDOR
+# @name loginVendedor
+POST {{usuarios}}/auth/login
+Content-Type: application/json
+
+{ "correo": "maria@duoc.cl", "clave": "vend123" }
+
+###
+@tokenVendedor = {{loginVendedor.response.body.accessToken}}
+
+### Login como CLIENTE
+# @name loginCliente
+POST {{usuarios}}/auth/login
+Content-Type: application/json
+
+{ "correo": "juan@gmail.com", "clave": "cli123" }
+
+###
+@tokenCliente = {{loginCliente.response.body.accessToken}}
+
+### ============ CATEGORÍAS ============
+
+### Listar (público)
 GET {{host}}/categorias
 
-### Crear categoria nueva (201)
-POST {{host}}/categorias
-Content-Type: application/json
+### Obtener por id (público)
+GET {{host}}/categorias/1
 
-{ "nombre": "Jardin", "slug": "jardin", "icono": "jardin.svg" }
-
-### Crear la misma otra vez (409)
-POST {{host}}/categorias
-Content-Type: application/json
-
-{ "nombre": "Jardin", "slug": "jardin", "icono": "jardin.svg" }
-
-### Categoria inexistente (404)
+### Categoría inexistente -> 404
 GET {{host}}/categorias/999
 
-### Borrar categoria con productos (409)
-DELETE {{host}}/categorias/1
+### Crear (ADMINISTRADOR) -> 201
+# @name crearCategoria
+POST {{host}}/categorias
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
 
-### Borrar categoria vacia (204). Cambia el 7 por el id de "Jardin"
-DELETE {{host}}/categorias/7
+{ "nombre": "Jardinería", "slug": "jardineria", "icono": "caja-herramientas.svg" }
+
+###
+@idCategoria = {{crearCategoria.response.body.id}}
+
+### Crear con nombre/slug repetido -> 409
+POST {{host}}/categorias
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{ "nombre": "Pinturas", "slug": "pinturas", "icono": "pintura.svg" }
+
+### Crear sin datos -> 400
+POST {{host}}/categorias
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{ "nombre": "", "slug": "" }
+
+### Crear sin token -> 401
+POST {{host}}/categorias
+Content-Type: application/json
+
+{ "nombre": "Otra", "slug": "otra" }
+
+### Crear como VENDEDOR -> 403
+POST {{host}}/categorias
+Authorization: Bearer {{tokenVendedor}}
+Content-Type: application/json
+
+{ "nombre": "Otra", "slug": "otra" }
+
+### Eliminar la categoría recién creada (sin productos) -> 204
+DELETE {{host}}/categorias/{{idCategoria}}
+Authorization: Bearer {{tokenAdmin}}
+
+### Eliminar una categoría con productos -> 409
+DELETE {{host}}/categorias/1
+Authorization: Bearer {{tokenAdmin}}
 
 ### ============ PRODUCTOS ============
 
-### Listar productos (6)
+### Listar (público)
 GET {{host}}/productos
 
-### Filtrar por categoria (1 producto)
+### Filtrar por categoría (público)
 GET {{host}}/productos?categoria=pinturas
 
-### Stock critico
-GET {{host}}/productos/stock-critico
-
-### Detalle de un producto
+### Detalle (público)
 GET {{host}}/productos/1
 
-### Crear producto (201)
+### Producto inexistente -> 404
+GET {{host}}/productos/999
+
+### Stock crítico como ADMINISTRADOR
+GET {{host}}/productos/stock-critico
+Authorization: Bearer {{tokenAdmin}}
+
+### Stock crítico como VENDEDOR
+GET {{host}}/productos/stock-critico
+Authorization: Bearer {{tokenVendedor}}
+
+### Stock crítico como CLIENTE -> 403
+GET {{host}}/productos/stock-critico
+Authorization: Bearer {{tokenCliente}}
+
+### Stock crítico sin token -> 401
+GET {{host}}/productos/stock-critico
+
+### Crear (ADMINISTRADOR) -> 201
+# @name crearProducto
 POST {{host}}/productos
+Authorization: Bearer {{tokenAdmin}}
 Content-Type: application/json
 
 { "codigo": "SIE100", "nombre": "Sierra Circular", "precio": 45000, "stock": 5, "stockCritico": 2, "categoriaId": 2 }
 
-### Codigo repetido (409): ejecuta la peticion anterior otra vez
+###
+@idProducto = {{crearProducto.response.body.id}}
 
-### Precio negativo (400)
+### Crear con precio negativo -> 400
 POST {{host}}/productos
+Authorization: Bearer {{tokenAdmin}}
 Content-Type: application/json
 
 { "codigo": "XXX999", "nombre": "Prueba", "precio": -5, "stock": 1, "stockCritico": 5, "categoriaId": 1 }
 
-### Producto inexistente (404)
-GET {{host}}/productos/999
+### Crear con código repetido -> 409
+POST {{host}}/productos
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
 
-### Modificar producto (200)
+{ "codigo": "SIE100", "nombre": "Sierra Repetida", "precio": 1000, "stock": 1, "categoriaId": 2 }
+
+### Crear como VENDEDOR -> 403
+POST {{host}}/productos
+Authorization: Bearer {{tokenVendedor}}
+Content-Type: application/json
+
+{ "codigo": "VEN001", "nombre": "No debería crearse", "precio": 1000, "stock": 1, "categoriaId": 1 }
+
+### Crear como CLIENTE -> 403
+POST {{host}}/productos
+Authorization: Bearer {{tokenCliente}}
+Content-Type: application/json
+
+{ "codigo": "CLI001", "nombre": "No debería crearse", "precio": 1000, "stock": 1, "categoriaId": 1 }
+
+### Crear sin token -> 401
+POST {{host}}/productos
+Content-Type: application/json
+
+{ "codigo": "SIN001", "nombre": "No debería crearse", "precio": 1000, "stock": 1, "categoriaId": 1 }
+
+### Actualizar (ADMINISTRADOR)
 PUT {{host}}/productos/1
+Authorization: Bearer {{tokenAdmin}}
 Content-Type: application/json
 
 { "codigo": "MAR001", "nombre": "Martillo Carpintero Pro", "precio": 7990, "stock": 25, "stockCritico": 5, "categoriaId": 1 }
 
-### ============ STOCK ============
+### Actualizar como VENDEDOR -> 403
+PUT {{host}}/productos/1
+Authorization: Bearer {{tokenVendedor}}
+Content-Type: application/json
 
-### Descontar stock (200)
+{ "codigo": "MAR001", "nombre": "Hackeado", "precio": 1, "stock": 25, "stockCritico": 5, "categoriaId": 1 }
+
+### Descontar stock con sesión de CLIENTE (así compra la tienda)
+PATCH {{host}}/productos/1/stock/descontar
+Authorization: Bearer {{tokenCliente}}
+Content-Type: application/json
+
+{ "cantidad": 2 }
+
+### Descontar stock sin token -> 401
 PATCH {{host}}/productos/1/stock/descontar
 Content-Type: application/json
 
 { "cantidad": 2 }
 
-### Descontar mas de lo disponible (409)
+### Descontar más del stock disponible -> 409
 PATCH {{host}}/productos/1/stock/descontar
+Authorization: Bearer {{tokenCliente}}
 Content-Type: application/json
 
 { "cantidad": 9999 }
 
-### Aumentar stock (200)
-PATCH {{host}}/productos/1/stock/aumentar
+### Descontar cantidad inválida -> 400
+PATCH {{host}}/productos/1/stock/descontar
+Authorization: Bearer {{tokenCliente}}
 Content-Type: application/json
 
-{ "cantidad": 5 }
+{ "cantidad": 0 }
 
-### Borrar un producto (204). Cambia el 7 por el id del que creaste
-DELETE {{host}}/productos/7
+### Eliminar como CLIENTE -> 403
+DELETE {{host}}/productos/{{idProducto}}
+Authorization: Bearer {{tokenCliente}}
+
+### Eliminar el producto recién creado (ADMINISTRADOR) -> 204
+DELETE {{host}}/productos/{{idProducto}}
+Authorization: Bearer {{tokenAdmin}}

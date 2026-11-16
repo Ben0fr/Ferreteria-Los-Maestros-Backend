@@ -34,13 +34,11 @@ public class GlobalExceptionHandler {
         return construir(HttpStatus.BAD_REQUEST, detalle.toString());
     }
 
-    // Por ejemplo, un valor que no corresponde al tipo del parametro (?leido=abc)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<Map<String, Object>> manejarParametro(MethodArgumentTypeMismatchException ex) {
         return construir(HttpStatus.BAD_REQUEST, "Valor no valido para el parametro " + ex.getName());
     }
 
-    // Por ejemplo, un JSON mal formado 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, Object>> manejarCuerpo(HttpMessageNotReadableException ex) {
         return construir(HttpStatus.BAD_REQUEST, "El cuerpo de la solicitud no es valido");

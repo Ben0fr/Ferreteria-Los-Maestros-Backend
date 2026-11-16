@@ -1,0 +1,57 @@
+@productos = http://localhost:8082/api/v1
+@usuarios = http://localhost:8081/api/v1
+
+### Tokens (se piden a usuarios-service, que debe estar corriendo)
+# @name loginAdmin
+POST {{usuarios}}/auth/login
+Content-Type: application/json
+
+{ "correo": "admin@gmail.com", "clave": "admin123" }
+
+###
+@tokenAdmin = {{loginAdmin.response.body.accessToken}}
+
+### 
+# @name loginVendedor
+POST {{usuarios}}/auth/login
+Content-Type: application/json
+
+{ "correo": "maria@duoc.cl", "clave": "vend123" }
+
+###
+@tokenVendedor = {{loginVendedor.response.body.accessToken}}
+
+### ======= LECTURA PÚBLICA (sin token) -> 200 =======
+GET {{productos}}/productos
+
+###
+GET {{productos}}/categorias
+
+### ======= STOCK CRÍTICO =======
+### Sin token -> 401
+GET {{productos}}/productos/stock-critico
+
+### Vendedor -> 200
+GET {{productos}}/productos/stock-critico
+Authorization: Bearer {{tokenVendedor}}
+
+### ======= ESCRITURA (solo ADMINISTRADOR) =======
+### Sin token -> 401
+POST {{productos}}/categorias
+Content-Type: application/json
+
+{ "nombre": "Pinturas", "slug": "pinturas" }
+
+### Vendedor -> 403
+POST {{productos}}/categorias
+Authorization: Bearer {{tokenVendedor}}
+Content-Type: application/json
+
+{ "nombre": "Pinturas", "slug": "pinturas" }
+
+### Administrador -> 201 (si la repites da 409: ya existe)
+POST {{productos}}/categorias
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{ "nombre": "Jardinería", "slug": "jardineria" }

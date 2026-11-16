@@ -6,7 +6,6 @@ import cl.ferreteria.ordenes.model.Orden;
 
 import java.time.LocalDateTime;
 
-// Version corta de la orden, para mostrar en listados
 public record OrdenResumen(
     Long id,
     String clienteNombre,

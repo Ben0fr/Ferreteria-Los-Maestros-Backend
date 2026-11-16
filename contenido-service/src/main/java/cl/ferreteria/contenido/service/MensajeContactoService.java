@@ -21,7 +21,6 @@ public class MensajeContactoService {
         this.repo = repo;
     }
 
-    // Guarda el mensaje que envia un visitante desde el formulario de contacto
     @Transactional
     public MensajeResponse crear(MensajeRequest r) {
         MensajeContacto m = new MensajeContacto();
@@ -33,7 +32,6 @@ public class MensajeContactoService {
         return MensajeResponse.desde(repo.save(m));
     }
 
-    // Lista los mensajes (mas nuevos primero). Con "leido" se filtran los leidos o los pendientes
     @Transactional(readOnly = true)
     public List<MensajeResponse> listar(Boolean leido) {
         List<MensajeContacto> lista = (leido == null)
@@ -47,7 +45,6 @@ public class MensajeContactoService {
         return MensajeResponse.desde(buscar(id));
     }
 
-    // Marca un mensaje como leido o como pendiente
     @Transactional
     public MensajeResponse marcarLeido(Long id, boolean leido) {
         MensajeContacto m = buscar(id);

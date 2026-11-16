@@ -12,8 +12,6 @@ import java.time.LocalDateTime;
 
 @Configuration
 public class DataLoader {
-
-    // Carga unas ordenes de ejemplo la primera vez, para que el vendedor tenga algo que ver
     @Bean
     CommandLineRunner cargarOrdenesIniciales(OrdenRepository ordenes) {
         return args -> {

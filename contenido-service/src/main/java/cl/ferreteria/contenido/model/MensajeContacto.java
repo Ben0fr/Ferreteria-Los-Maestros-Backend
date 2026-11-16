@@ -30,7 +30,6 @@ public class MensajeContacto {
     @Column(nullable = false)
     private LocalDateTime fecha;
 
-    // Para que el administrador marque los mensajes que ya reviso
     @Column(nullable = false)
     private boolean leido;
 }

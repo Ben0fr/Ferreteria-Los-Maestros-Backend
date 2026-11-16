@@ -1,0 +1,153 @@
+@host = http://localhost:8081/api/v1
+
+### ============ AUTENTICACIÓN ============
+
+### Registro de un cliente (público)
+POST {{host}}/auth/registro
+Content-Type: application/json
+
+{ "nombre": "Pedro", "apellidos": "Soto", "correo": "pedro@gmail.com", "clave": "pedro123" }
+
+### Registro con correo repetido -> 409
+POST {{host}}/auth/registro
+Content-Type: application/json
+
+{ "nombre": "Pedro", "correo": "pedro@gmail.com", "clave": "pedro123" }
+
+### Registro con datos inválidos -> 400
+POST {{host}}/auth/registro
+Content-Type: application/json
+
+{ "nombre": "", "correo": "pedro@hotmail.com", "clave": "1" }
+
+### Login como ADMINISTRADOR (guarda los tokens para las siguientes peticiones)
+# @name loginAdmin
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{ "correo": "admin@gmail.com", "clave": "admin123" }
+
+###
+@tokenAdmin = {{loginAdmin.response.body.accessToken}}
+@refreshAdmin = {{loginAdmin.response.body.refreshToken}}
+
+### Login como VENDEDOR
+# @name loginVendedor
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{ "correo": "maria@duoc.cl", "clave": "vend123" }
+
+###
+@tokenVendedor = {{loginVendedor.response.body.accessToken}}
+
+### Login como CLIENTE
+# @name loginCliente
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{ "correo": "juan@gmail.com", "clave": "cli123" }
+
+###
+@tokenCliente = {{loginCliente.response.body.accessToken}}
+
+### Login con clave incorrecta -> 401
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{ "correo": "admin@gmail.com", "clave": "equivocada" }
+
+### Datos de mi sesión
+GET {{host}}/auth/me
+Authorization: Bearer {{tokenAdmin}}
+
+### Sin token -> 401
+GET {{host}}/auth/me
+
+### Renovar tokens
+POST {{host}}/auth/refresh
+Content-Type: application/json
+
+{ "refreshToken": "{{refreshAdmin}}" }
+
+### Usar un ACCESS token como refresh -> 401
+POST {{host}}/auth/refresh
+Content-Type: application/json
+
+{ "refreshToken": "{{tokenAdmin}}" }
+
+### ============ USUARIOS (solo ADMINISTRADOR) ============
+
+### Listar usuarios
+GET {{host}}/usuarios
+Authorization: Bearer {{tokenAdmin}}
+
+### Filtrar por rol
+GET {{host}}/usuarios?rol=VENDEDOR
+Authorization: Bearer {{tokenAdmin}}
+
+### Un VENDEDOR no puede listar usuarios -> 403
+GET {{host}}/usuarios
+Authorization: Bearer {{tokenVendedor}}
+
+### Un CLIENTE no puede listar usuarios -> 403
+GET {{host}}/usuarios
+Authorization: Bearer {{tokenCliente}}
+
+### Obtener por id
+GET {{host}}/usuarios/2
+Authorization: Bearer {{tokenAdmin}}
+
+### Usuario inexistente -> 404
+GET {{host}}/usuarios/999
+Authorization: Bearer {{tokenAdmin}}
+
+### Crear un vendedor
+# @name crearVendedor
+POST {{host}}/usuarios
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "run": "12345678K",
+  "nombre": "Carlos",
+  "apellidos": "Muñoz",
+  "correo": "carlos@duoc.cl",
+  "clave": "carlos1",
+  "rol": "VENDEDOR",
+  "region": "Valparaíso",
+  "comuna": "Viña del Mar",
+  "direccion": "Calle 123"
+}
+
+###
+@idNuevo = {{crearVendedor.response.body.id}}
+
+### Actualizar (sin clave: se mantiene la actual)
+PUT {{host}}/usuarios/{{idNuevo}}
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "run": "12345678K",
+  "nombre": "Carlos Andrés",
+  "apellidos": "Muñoz",
+  "correo": "carlos@duoc.cl",
+  "rol": "VENDEDOR",
+  "activo": true
+}
+
+### El admin intenta quitarse su propio rol -> 409
+PUT {{host}}/usuarios/1
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{ "nombre": "Administrador", "correo": "admin@gmail.com", "rol": "VENDEDOR", "activo": true }
+
+### El admin intenta eliminarse a sí mismo -> 409
+DELETE {{host}}/usuarios/1
+Authorization: Bearer {{tokenAdmin}}
+
+### Eliminar otro usuario -> 204
+DELETE {{host}}/usuarios/{{idNuevo}}
+Authorization: Bearer {{tokenAdmin}}

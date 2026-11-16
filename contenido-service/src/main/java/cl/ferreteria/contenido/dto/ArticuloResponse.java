@@ -18,7 +18,6 @@ public record ArticuloResponse(
     LocalDate fechaPublicacion
 ) {
 
-    // "parrafos" es el contenido separado por lineas en blanco, listo para mostrar en el detalle del blog
     public static ArticuloResponse desde(Articulo a) {
         List<String> parrafos = Arrays.stream(a.getContenido().split("\\R{2,}"))
             .map(String::trim)

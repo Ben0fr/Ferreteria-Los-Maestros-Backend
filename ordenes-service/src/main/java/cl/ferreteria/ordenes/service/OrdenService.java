@@ -32,7 +32,6 @@ public class OrdenService {
         this.productos = productos;
     }
 
-    // Lista las ordenes (mas nuevas primero), con filtros opcionales por estado y por correo del cliente
     @Transactional(readOnly = true)
     public List<OrdenResumen> listar(EstadoOrden estado, String correo) {
         boolean hayCorreo = correo != null && !correo.isBlank();
@@ -51,15 +50,12 @@ public class OrdenService {
         return lista.stream().map(OrdenResumen::desde).toList();
     }
 
-    // Devuelve una orden con el detalle de sus productos
     @Transactional(readOnly = true)
     public OrdenResponse obtener(Long id) {
         return OrdenResponse.desde(buscar(id));
     }
 
-    // Crea una orden: valida productos y stock, toma los precios de productos-service y descuenta el stock
     public OrdenResponse crear(OrdenRequest r) {
-        // Si el mismo producto viene repetido, se suman las cantidades
         Map<Long, Integer> cantidades = new LinkedHashMap<>();
         for (ItemRequest item : r.items()) {
             cantidades.merge(item.productoId(), item.cantidad(), Integer::sum);
@@ -92,8 +88,6 @@ public class OrdenService {
             orden.agregarDetalle(detalle);
         }
         orden.setTotal(total);
-
-        // Se descuenta el stock; si algo falla, se devuelve lo que ya se habia descontado
         List<DetalleOrden> descontados = new ArrayList<>();
         try {
             for (DetalleOrden detalle : orden.getDetalles()) {
@@ -107,7 +101,6 @@ public class OrdenService {
         }
     }
 
-    // Cambia el estado de una orden respetando el flujo permitido. Si se cancela, devuelve el stock
     @Transactional
     public OrdenResponse cambiarEstado(Long id, EstadoOrden nuevo) {
         Orden orden = buscar(id);
@@ -136,7 +129,7 @@ public class OrdenService {
             try {
                 productos.aumentarStock(detalle.getProductoId(), detalle.getCantidad());
             } catch (RuntimeException ignorado) {
-                // Si no se puede devolver, se sigue con los demas para no ocultar el error original
+                
             }
         }
     }

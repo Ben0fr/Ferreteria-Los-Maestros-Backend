@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-// Mismas reglas que el formulario de contacto de la tienda
 public record MensajeRequest(
 
     @NotBlank(message = "El nombre es obligatorio")

@@ -6,7 +6,6 @@ import cl.ferreteria.ordenes.model.Orden;
 import java.time.LocalDateTime;
 import java.util.List;
 
-// Orden completa, con el detalle de cada producto (para la vista de detalle / boleta)
 public record OrdenResponse(
     Long id,
     String clienteNombre,

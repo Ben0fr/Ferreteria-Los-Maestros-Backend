@@ -1,6 +1,5 @@
 package cl.ferreteria.ordenes.dto;
 
-// Producto tal como lo entrega productos-service
 public record ProductoRemoto(
     Long id,
     String codigo,

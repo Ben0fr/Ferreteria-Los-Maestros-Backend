@@ -24,7 +24,6 @@ public class Articulo {
     @Column(nullable = false, length = 300)
     private String resumen;
 
-    // Texto completo del articulo. Los parrafos se separan con una linea en blanco
     @Column(nullable = false, columnDefinition = "TEXT")
     private String contenido;
 
