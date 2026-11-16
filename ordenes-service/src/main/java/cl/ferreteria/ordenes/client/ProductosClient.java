@@ -13,7 +13,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Map;
 import java.util.function.Supplier;
 
-// Llama a productos-service para consultar productos y mover su stock
 @Component
 public class ProductosClient {
 
@@ -66,7 +65,7 @@ public class ProductosClient {
                 return cuerpo.get("message").toString();
             }
         } catch (Exception ignorado) {
-            // Si el cuerpo no se puede leer, se usa el mensaje por defecto
+
         }
         return "Error al consultar productos-service";
     }

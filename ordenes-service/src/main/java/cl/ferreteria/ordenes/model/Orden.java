@@ -42,7 +42,6 @@ public class Orden {
     @OneToMany(mappedBy = "orden", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleOrden> detalles = new ArrayList<>();
 
-    // Agrega un detalle a la orden y lo enlaza con ella
     public void agregarDetalle(DetalleOrden detalle) {
         detalle.setOrden(this);
         detalles.add(detalle);

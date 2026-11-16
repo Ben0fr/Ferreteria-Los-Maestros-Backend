@@ -70,7 +70,7 @@ public class ProductosClient {
                 return cuerpo.get("message").toString();
             }
         } catch (Exception ignorado) {
-            //Si el cuerpo no se lee envia un mensaje x defecto.
+
         }
         return  "Error al consultar productos-service";
     }

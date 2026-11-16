@@ -34,13 +34,11 @@ public class GlobalExceptionHandler {
         return construir(HttpStatus.BAD_REQUEST, detalle.toString());
     }
 
-    // Por ejemplo, un estado que no existe en la URL (?estado=XYZ)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<Map<String, Object>> manejarParametro(MethodArgumentTypeMismatchException ex) {
         return construir(HttpStatus.BAD_REQUEST, "Valor no valido para el parametro " + ex.getName());
     }
 
-    // Por ejemplo, un JSON mal formado o un estado que no existe en el cuerpo
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, Object>> manejarCuerpo(HttpMessageNotReadableException ex) {
         return construir(HttpStatus.BAD_REQUEST, "El cuerpo de la solicitud no es valido");

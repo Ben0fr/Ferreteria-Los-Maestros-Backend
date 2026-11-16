@@ -23,7 +23,6 @@ public class ArticuloService {
         this.repo = repo;
     }
 
-    // Lista los articulos, los mas nuevos primero
     @Transactional(readOnly = true)
     public List<ArticuloResponse> listar() {
         return repo.findAllByOrderByFechaPublicacionDescIdDesc().stream()

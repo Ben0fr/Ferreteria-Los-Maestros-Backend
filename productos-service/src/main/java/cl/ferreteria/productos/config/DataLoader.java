@@ -19,12 +19,12 @@ public class DataLoader {
                 return;
             }
 
-            Categoria manuales = categorias.save(new Categoria("Herramientas manueales", "manuales", "martillo.svg"));
-            Categoria electricas = categorias.save(new Categoria("Herramientas electricas", "Electricas", "taladro.svg"));
-            Categoria construccion = categorias.save(new Categoria("Materiales de construccion", "construccion", "ladrillos.svg"));
+            Categoria manuales = categorias.save(new Categoria("Herramientas manuales", "manuales", "martillo.svg"));
+            Categoria electricas = categorias.save(new Categoria("Herramientas eléctricas", "electricas", "taladro.svg"));
+            Categoria construccion = categorias.save(new Categoria("Materiales de construcción", "construccion", "ladrillos.svg"));
             Categoria pinturas = categorias.save(new Categoria("Pinturas", "pinturas", "pintura.svg"));
             Categoria seguridad = categorias.save(new Categoria("Seguridad y EPP", "seguridad", "guante.svg"));
-            Categoria general = categorias.save(new Categoria("Ferreteria general", "general", "tornillo.svg"));
+            Categoria general = categorias.save(new Categoria("Ferretería general", "general", "tornillo.svg"));
 
             crear(productos, "MAR001", "Martillo Carpintero", manuales, 6990, 25, "martillo.svg");
             crear(productos, "TAL002", "Taladro Percutor 650W", electricas, 39990, 12, "taladro.svg");

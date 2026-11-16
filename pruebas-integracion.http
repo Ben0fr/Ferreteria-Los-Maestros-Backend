@@ -1,0 +1,156 @@
+# Recorrido completo del backend (extensión REST Client de VS Code). Los 5 servicios deben estar encendidos.
+@usuarios = http://localhost:8081/api/v1
+@productos = http://localhost:8082/api/v1
+@ordenes = http://localhost:8083/api/v1
+@contenido = http://localhost:8084/api/v1
+@inventario = http://localhost:8085/api/v1
+
+### ===== 1. Tokens =====
+# @name loginAdmin
+POST {{usuarios}}/auth/login
+Content-Type: application/json
+
+{ "correo": "admin@gmail.com", "clave": "admin123" }
+
+###
+@tokenAdmin = {{loginAdmin.response.body.accessToken}}
+
+###
+# @name loginVendedor
+POST {{usuarios}}/auth/login
+Content-Type: application/json
+
+{ "correo": "maria@duoc.cl", "clave": "vend123" }
+
+###
+@tokenVendedor = {{loginVendedor.response.body.accessToken}}
+
+###
+# @name loginCliente
+POST {{usuarios}}/auth/login
+Content-Type: application/json
+
+{ "correo": "juan@gmail.com", "clave": "cli123" }
+
+###
+@tokenCliente = {{loginCliente.response.body.accessToken}}
+
+### ===== 2. Productos =====
+### Catálogo público -> 200
+GET {{productos}}/productos
+
+### Crear producto sin token -> 401
+POST {{productos}}/categorias
+Content-Type: application/json
+
+{ "nombre": "Pinturas", "slug": "pinturas" }
+
+### Crear con vendedor -> 403
+POST {{productos}}/categorias
+Authorization: Bearer {{tokenVendedor}}
+Content-Type: application/json
+
+{ "nombre": "Pinturas", "slug": "pinturas" }
+
+### ===== 3. Compra (cliente) =====
+### Sin token -> 401
+POST {{ordenes}}/ordenes
+Content-Type: application/json
+
+{ "clienteNombre": "Juan Pérez", "clienteCorreo": "x@gmail.com", "direccionEntrega": "Calle 1", "items": [ { "productoId": 1, "cantidad": 1 } ] }
+
+### Con token de cliente -> 201 (el correo queda como el del token aunque se envíe otro)
+# @name crearOrden
+POST {{ordenes}}/ordenes
+Authorization: Bearer {{tokenCliente}}
+Content-Type: application/json
+
+{ "clienteNombre": "Juan Pérez", "clienteCorreo": "suplantado@gmail.com", "direccionEntrega": "Av. Francisco de Aguirre 123, La Serena", "items": [ { "productoId": 1, "cantidad": 2 } ] }
+
+###
+@idOrden = {{crearOrden.response.body.id}}
+
+### Stock de ese producto bajó en 2
+GET {{productos}}/productos/1
+
+### Stock insuficiente -> 409
+POST {{ordenes}}/ordenes
+Authorization: Bearer {{tokenCliente}}
+Content-Type: application/json
+
+{ "clienteNombre": "Juan Pérez", "clienteCorreo": "juan@gmail.com", "direccionEntrega": "Calle 1", "items": [ { "productoId": 1, "cantidad": 99999 } ] }
+
+### ===== 4. Órdenes según el rol =====
+### El cliente ve solo las suyas
+GET {{ordenes}}/ordenes
+Authorization: Bearer {{tokenCliente}}
+
+### El vendedor ve todas
+GET {{ordenes}}/ordenes
+Authorization: Bearer {{tokenVendedor}}
+
+### El vendedor ve el detalle
+GET {{ordenes}}/ordenes/{{idOrden}}
+Authorization: Bearer {{tokenVendedor}}
+
+### El cliente no puede ver la orden de otro (la 2 es de María) -> 403
+GET {{ordenes}}/ordenes/2
+Authorization: Bearer {{tokenCliente}}
+
+### El vendedor no puede cambiar el estado -> 403
+PATCH {{ordenes}}/ordenes/{{idOrden}}/estado
+Authorization: Bearer {{tokenVendedor}}
+Content-Type: application/json
+
+{ "estado": "CONFIRMADA" }
+
+### El administrador sí -> 200
+PATCH {{ordenes}}/ordenes/{{idOrden}}/estado
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{ "estado": "CONFIRMADA" }
+
+### Cancelar devuelve el stock
+PATCH {{ordenes}}/ordenes/{{idOrden}}/estado
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{ "estado": "CANCELADA" }
+
+### ===== 5. Inventario =====
+### Alertas de stock crítico (vendedor) -> 200
+GET {{inventario}}/inventario/alertas
+Authorization: Bearer {{tokenVendedor}}
+
+### Cliente -> 403
+GET {{inventario}}/inventario/alertas
+Authorization: Bearer {{tokenCliente}}
+
+### Entrada de stock (admin) -> 201
+POST {{inventario}}/inventario/movimientos
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{ "productoId": 1, "tipo": "ENTRADA", "cantidad": 10, "motivo": "Reposición de bodega" }
+
+### Historial
+GET {{inventario}}/inventario/movimientos
+Authorization: Bearer {{tokenAdmin}}
+
+### ===== 6. Contenido =====
+### Blog público -> 200
+GET {{contenido}}/articulos
+
+### Mensaje de contacto público -> 201
+POST {{contenido}}/contacto
+Content-Type: application/json
+
+{ "nombre": "Pedro Soto", "correo": "pedro@gmail.com", "comentario": "Hola, ¿tienen taladros en stock?" }
+
+### Leer mensajes sin ser admin -> 401
+GET {{contenido}}/contacto
+
+### Leer mensajes siendo admin -> 200
+GET {{contenido}}/contacto
+Authorization: Bearer {{tokenAdmin}}

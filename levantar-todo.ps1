@@ -1,4 +1,4 @@
-# Levanta los 4 microservicios, cada uno en su propia ventana de PowerShell.
+# Levanta los 5 microservicios, cada uno en su propia ventana de PowerShell.
 # Uso: powershell -ExecutionPolicy Bypass -File .\levantar-todo.ps1
 # Para detener un servicio, presiona Ctrl+C en su ventana (o cierrala).
 
@@ -25,7 +25,8 @@ if (-not (Puerto-Ocupado 3306)) {
     exit 1
 }
 
-# Productos va primero: inventario y ordenes le consultan los productos
+# Usuarios emite los tokens JWT; productos va antes que inventario y ordenes porque le consultan los productos
+Levantar 'usuarios-service' 8081
 Levantar 'productos-service' 8082
 
 Write-Host "Esperando a que productos-service este listo (puede tardar la primera vez)..."
@@ -45,6 +46,7 @@ Levantar 'inventario-service' 8085
 
 Write-Host ""
 Write-Host "Listo. Swagger de cada servicio:" -ForegroundColor Green
+Write-Host "  Usuarios    http://localhost:8081/swagger-ui.html"
 Write-Host "  Productos   http://localhost:8082/swagger-ui.html"
 Write-Host "  Ordenes     http://localhost:8083/swagger-ui.html"
 Write-Host "  Contenido   http://localhost:8084/swagger-ui.html"

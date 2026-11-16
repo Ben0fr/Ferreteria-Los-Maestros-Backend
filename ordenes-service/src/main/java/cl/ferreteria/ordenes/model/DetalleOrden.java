@@ -20,11 +20,9 @@ public class DetalleOrden {
     @JoinColumn(name = "orden_id")
     private Orden orden;
 
-    // Id del producto en productos-service (no es una llave foranea porque es otra base de datos)
     @Column(nullable = false)
     private Long productoId;
 
-    // Se guardan el nombre y el precio del momento de la compra, por si el producto cambia despues
     @Column(nullable = false, length = 100)
     private String productoNombre;
 
