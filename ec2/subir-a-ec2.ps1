@@ -5,7 +5,8 @@
 param(
     [Parameter(Mandatory = $true)] [string] $Ip,
     [Parameter(Mandatory = $true)] [string] $Llave,
-    [string] $Frontend = "$env:USERPROFILE\Documents\proyecto fullstack completo\proyecto fullstack completo\Ferreteria-Los-Maestros-Frontend"
+    # Por defecto, el repo del frontend clonado al lado del repo del backend
+    [string] $Frontend = (Join-Path $PSScriptRoot '..\..\Ferreteria-Los-Maestros-Frontend')
 )
 
 $raiz = Split-Path $PSScriptRoot -Parent
