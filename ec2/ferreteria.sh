@@ -3,7 +3,8 @@
 # asi se levantan solos cada vez que el Learner Lab vuelve a encender la instancia.
 #
 # Uso (dentro de la carpeta ~/ferreteria de la EC2):
-#   ./ferreteria.sh instalar        instala Java 17 y registra los servicios (una vez, o tras subir jars nuevos)
+#   ./ferreteria.sh instalar        instala Java 17, registra los servicios y monta el frontend en nginx
+#                                   (una vez, o cada vez que subas jars o frontend nuevos)
 #   ./ferreteria.sh bd <usuario>    ejecuta los scripts .sql en RDS con el usuario admin de RDS
 #   ./ferreteria.sh iniciar | detener | reiniciar | estado
 #   ./ferreteria.sh logs <servicio> muestra el log en vivo (usuarios, productos, ordenes, contenido, inventario)
@@ -20,6 +21,8 @@ cargar_env() {
         echo "Falta $ENV_FILE. Copia ferreteria.env.ejemplo a ferreteria.env y completa los datos de RDS."
         exit 1
     fi
+    # Quita los saltos de linea de Windows (\r) si el archivo se edito o se subio desde Windows
+    sed -i 's/\r$//' "$ENV_FILE"
     set -a; . "$ENV_FILE"; set +a
 }
 
@@ -59,7 +62,27 @@ EOF
 
     sudo systemctl daemon-reload
     for s in $SERVICIOS; do sudo systemctl enable ferreteria-$s; done
+    instalar_frontend
     echo "Servicios instalados. Ejecuta: ./ferreteria.sh iniciar"
+}
+
+# nginx sirve el frontend (carpeta frontend/, la sube subir-a-ec2.ps1) en el puerto 80
+# y reenvia /api/v1/... a los microservicios
+instalar_frontend() {
+    if [ ! -f "$DIR/frontend/index.html" ]; then
+        echo "No se encontro $DIR/frontend: se instala solo el backend."
+        return
+    fi
+    sudo dnf install -y nginx
+    sudo rm -rf /usr/share/nginx/ferreteria
+    sudo cp -r "$DIR/frontend" /usr/share/nginx/ferreteria
+    # scp desde Windows puede dejar los archivos legibles solo por ec2-user; nginx corre con su propio usuario
+    sudo chmod -R a+rX /usr/share/nginx/ferreteria
+    sed 's/\r$//' "$DIR/nginx-ferreteria.conf" | sudo tee /etc/nginx/conf.d/ferreteria.conf > /dev/null
+    sudo nginx -t
+    sudo systemctl enable nginx
+    sudo systemctl restart nginx
+    echo "Frontend instalado en nginx (puerto 80)."
 }
 
 bd() {
@@ -89,9 +112,12 @@ estado() {
     for s in $SERVICIOS; do
         printf "%-12s %s\n" "$s" "$(systemctl is-active ferreteria-$s)"
     done
+    printf "%-12s %s\n" "nginx" "$(systemctl is-active nginx 2>/dev/null)"
     ip=$(curl -s -m 2 http://checkip.amazonaws.com || echo "<IP-publica>")
     echo
-    echo "Swagger:"
+    echo "Pagina web:  http://$ip"
+    echo
+    echo "Swagger (requiere abrir los puertos 8081-8085 en el Security Group):"
     for p in $PUERTOS; do
         echo "  ${p%%:*}  http://$ip:${p##*:}/swagger-ui.html"
     done
@@ -105,5 +131,5 @@ case "$1" in
     reiniciar) for s in $SERVICIOS; do sudo systemctl restart ferreteria-$s; done; estado ;;
     estado)    estado ;;
     logs)      sudo journalctl -u ferreteria-${2:-productos} -f ;;
-    *)         sed -n '2,10p' "$0" ;;
+    *)         sed -n '2,11p' "$0" ;;
 esac
